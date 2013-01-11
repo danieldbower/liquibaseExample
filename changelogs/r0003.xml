@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog 
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext 
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet id="change relationship of book and author"
+		author="daniel.bower">
+		<comment>Change the relationship between book and author from one to
+			many to many-to-many</comment>
+
+		<createTable tableName="book_author">
+			<column name="id" type="int">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="book_id" type="int">
+				<constraints nullable="false" />
+			</column>
+			<column name="author_id" type="int">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+
+		<!-- Copy the data -->
+		<sql>select 1</sql>
+		
+		<dropForeignKeyConstraint constraintName="fk_book_author"
+				baseTableName="book" />
+		<dropColumn tableName="book" columnName="author_id" />
+		
+		<rollback>
+			<addColumn tableName="book">
+				<column name="author_id" type="int" />
+			</addColumn>
+			<addForeignKeyConstraint constraintName="fk_book_author"
+			baseTableName="book" baseColumnNames="author_id"
+			referencedTableName="author" referencedColumnNames="id" />
+		
+			<!-- copy the data -->
+			<sql>select 1</sql>
+			
+			<dropTable tableName="book_author" />
+		</rollback>
+	</changeSet>
+
+</databaseChangeLog>

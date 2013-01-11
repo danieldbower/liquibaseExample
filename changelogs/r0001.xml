@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog 
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext 
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet id="create book and author" author="daniel.bower">
+		<comment>Create Book and Author tables</comment>
+
+		<createTable tableName="author">
+			<column name="id" type="int">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="firstname" type="varchar(255)" />
+			<column name="lastname" type="varchar(255)" />
+			<column name="website" type="varchar(255)" />
+			<column name="twitter_handle" type="varchar(255)" />
+		</createTable>
+
+		<createTable tableName="book">
+			<column name="id" type="int">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="title" type="varchar(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="isbn" type="varchar(10)" />
+			<column name="pages" type="decimal" />
+			<column name="author_id" type="int" />
+		</createTable>
+
+		<rollback>
+			<dropTable tableName="book" />
+			<dropTable tableName="author" />
+		</rollback>
+	</changeSet>
+
+
+	<changeSet id="indexes for book and author" author="daniel.bower">
+		<comment>Create index on isbn for book and firstname/lastname for
+			author
+		</comment>
+		<createIndex tableName="book" indexName="idx_book_isbn">
+			<column name="isbn" />
+		</createIndex>
+
+		<createIndex tableName="author" indexName="idx_author_name">
+			<column name="firstname" />
+			<column name="lastname" />
+		</createIndex>
+
+		<rollback>
+			<dropIndex tableName="book" indexName="idx_book_isbn" />
+			<dropIndex tableName="author" indexName="idx_author_name" />
+		</rollback>
+	</changeSet>
+
+	<changeSet id="foreign key for book to author" author="daniel.bower">
+		<comment>Create foreign keys for book to author</comment>
+		<addForeignKeyConstraint constraintName="fk_book_author"
+			baseTableName="book" baseColumnNames="author_id"
+			referencedTableName="author" referencedColumnNames="id" />
+
+		<rollback>
+			<dropForeignKeyConstraint constraintName="fk_book_author"
+				baseTableName="book" />
+		</rollback>
+	</changeSet>
+
+</databaseChangeLog>
